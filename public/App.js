@@ -26,13 +26,15 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+// function to display individual rows
 function ItemRow(props) {
   var item = props.item;
   return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, item.name), /*#__PURE__*/React.createElement("td", null, "$" + item.price), /*#__PURE__*/React.createElement("td", null, item.category), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("a", {
     href: item.image,
     target: "_blank"
   }, "View")));
-}
+} // function to create table and display each item row
+
 
 function ItemTable(props) {
   var itemRows = props.items.map(function (item) {
@@ -44,13 +46,15 @@ function ItemTable(props) {
   return /*#__PURE__*/React.createElement("table", {
     className: "bordered-table"
   }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Product Name"), /*#__PURE__*/React.createElement("th", null, "Price"), /*#__PURE__*/React.createElement("th", null, "Category"), /*#__PURE__*/React.createElement("th", null, "Image"))), /*#__PURE__*/React.createElement("tbody", null, itemRows));
-}
+} // class to add items
+
 
 var ItemAdd = /*#__PURE__*/function (_React$Component) {
   _inherits(ItemAdd, _React$Component);
 
   var _super = _createSuper(ItemAdd);
 
+  // simple constructor, sets price state to blank
   function ItemAdd() {
     var _this;
 
@@ -62,7 +66,8 @@ var ItemAdd = /*#__PURE__*/function (_React$Component) {
       price: ''
     };
     return _this;
-  }
+  } // on submit
+
 
   _createClass(ItemAdd, [{
     key: "handleSubmit",
@@ -71,10 +76,11 @@ var ItemAdd = /*#__PURE__*/function (_React$Component) {
       var form = document.forms.itemAdd;
       var item = {
         name: form.name.value,
-        price: this.state.price,
         category: form.category.value,
+        price: this.state.price,
         image: form.image.value
-      };
+      }; // reset values
+
       this.props.createItem(item);
       form.name.value = "";
       this.setState({
@@ -133,7 +139,8 @@ var ItemAdd = /*#__PURE__*/function (_React$Component) {
   }]);
 
   return ItemAdd;
-}(React.Component);
+}(React.Component); // list class
+
 
 var ItemList = /*#__PURE__*/function (_React$Component2) {
   _inherits(ItemList, _React$Component2);
@@ -162,12 +169,12 @@ var ItemList = /*#__PURE__*/function (_React$Component2) {
     key: "loadData",
     value: function () {
       var _loadData = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var query, response, result;
+        var query, response, body, result;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                query = "query {\n        productList {\n            category name price image\n        }\n    }";
+                query = "query {\n            productList {\n                category name price image\n            }\n        }";
                 _context.next = 3;
                 return fetch('/graphql', {
                   method: 'POST',
@@ -182,15 +189,16 @@ var ItemList = /*#__PURE__*/function (_React$Component2) {
               case 3:
                 response = _context.sent;
                 _context.next = 6;
-                return response.json();
+                return response.text();
 
               case 6:
-                result = _context.sent;
+                body = _context.sent;
+                result = JSON.parse(body);
                 this.setState({
                   items: result.data.productList
                 });
 
-              case 8:
+              case 9:
               case "end":
                 return _context.stop();
             }
@@ -203,32 +211,47 @@ var ItemList = /*#__PURE__*/function (_React$Component2) {
       }
 
       return loadData;
-    }()
+    }() // create item and add to graphql
+
   }, {
     key: "createItem",
-    value: function createItem(item) {
-      // const query = `mutation {
-      //     productAdd(product: {
-      //         name: "${item.name},
-      //         category: "${item.category},
-      //         price: "${item.price},
-      //         image: "${item.image}, ) {
-      //             id
-      //         }
-      //     }`;
-      // const response = await fetch('/graphql', {
-      //     method: 'POST',
-      //     headers: { 'Content-Type': 'application/json'},
-      //     body: JSON.stringify({ query })
-      // });
-      // this.loadData();
-      item.id = this.state.items.length + 1;
-      var newItemList = this.state.items.slice();
-      newItemList.push(item);
-      this.setState({
-        items: newItemList
-      });
-    }
+    value: function () {
+      var _createItem = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(item) {
+        var query, response;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                query = "mutation {\n            productAdd(product:{\n                name: \"".concat(item.name, "\",\n                category: ").concat(item.category, ",\n                price: ").concat(item.price, ",\n                image: \"").concat(item.image, "\", \n            }) {\n                    id\n                }\n            }");
+                _context2.next = 3;
+                return fetch('/graphql', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    query: query
+                  })
+                });
+
+              case 3:
+                response = _context2.sent;
+                this.loadData();
+
+              case 5:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function createItem(_x) {
+        return _createItem.apply(this, arguments);
+      }
+
+      return createItem;
+    }()
   }, {
     key: "render",
     value: function render() {

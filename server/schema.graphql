@@ -15,7 +15,7 @@ type Product {
 }
 
 input ProductInputs {
-  category: ProductType = New
+  category: ProductType
   name: String!
   price: Float!
   image: String
@@ -24,11 +24,9 @@ input ProductInputs {
 ##### Top level declarations
 
 type Query {
-  about: String!
   productList: [Product!]!
 }
 
 type Mutation {
-  setAboutMessage(message: String!): String
   productAdd(product: ProductInputs!): Product!
 }
